@@ -1,20 +1,19 @@
-run: exe mylib.so
-	pwd
-	LD_PRELOAD=/home/zaraksh/ld_preload/mylib.so ./exe
+run: exe libc.so
+	./exe
 
 clean:
-	rm -f mylib.so mylib.o exe.o exe
+	rm -f libc.so libc.o exe.o exe
 
-mylib.so: mylib.o
-	ld -shared mylib.o -o mylib.so
-
-mylib.o: mylib.c
-	gcc -Wall -Wextra -fPIC -c mylib.c -o mylib.o
-
-exe: exe.o mylib.so
-	ld --entry main exe.o -L . -lc -o exe
+exe: exe.o libc.so
+	ld --entry main exe.o -L . -l:libc.so -o exe
 
 exe.o: exe.c
 	gcc -Wall -Wextra -c exe.c -o exe.o
+
+libc.so: libc.o
+	ld -shared libc.o -o libc.so
+
+libc.o: libc.c
+	gcc -Wall -Wextra -fPIC -c libc.c -o libc.o
 
 .PHONY: run clean
