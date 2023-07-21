@@ -1,19 +1,28 @@
-run: exe mylibc.so
-	LD_PRELOAD=/home/zaraksh/ld_preload/mylibc.so ./exe
+default: exe
+
+CFLAGS=-Wall -Wextra -masm=intel
+PWD=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 clean:
-	rm -f mylibc.so mylibc.o exe.o exe
+	rm -f libc.so libc.o exe.o exe
 
-exe: exe.o mylibc.so
-	ld --entry main exe.o -L . -l:mylibc.so -o exe
+exe: exe.o libc.so
+	ld \
+	--entry main \
+	--library-path=$(PWD) \
+	-l:libc.so \
+	-rpath=$(PWD) \
+	--dynamic-linker=/lib/ld-linux-x86-64.so.2 \
+	exe.o \
+	-o exe
 
 exe.o: exe.c
-	gcc -Wall -Wextra -masm=intel -c exe.c -o exe.o
+	gcc $(CFLAGS) -c exe.c -o exe.o
 
-mylibc.so: mylibc.o
-	ld -shared mylibc.o -o mylibc.so
+libc.so: libc.o
+	ld -shared libc.o -o libc.so
 
-mylibc.o: mylibc.c
-	gcc -Wall -Wextra -masm=intel -fPIC -c mylibc.c -o mylibc.o
+libc.o: libc.c
+	gcc $(CFLAGS) -c libc.c -o libc.o
 
 .PHONY: run clean
