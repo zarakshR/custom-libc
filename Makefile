@@ -1,19 +1,19 @@
-run: exe libc.so
-	./exe
+run: exe mylibc.so
+	LD_PRELOAD=/home/zaraksh/ld_preload/mylibc.so ./exe
 
 clean:
-	rm -f libc.so libc.o exe.o exe
+	rm -f mylibc.so mylibc.o exe.o exe
 
-exe: exe.o libc.so
-	ld --entry main exe.o -L . -l:libc.so -o exe
+exe: exe.o mylibc.so
+	ld --entry main exe.o -L . -l:mylibc.so -o exe
 
 exe.o: exe.c
-	gcc -Wall -Wextra -c exe.c -o exe.o
+	gcc -Wall -Wextra -masm=intel -c exe.c -o exe.o
 
-libc.so: libc.o
-	ld -shared libc.o -o libc.so
+mylibc.so: mylibc.o
+	ld -shared mylibc.o -o mylibc.so
 
-libc.o: libc.c
-	gcc -Wall -Wextra -fPIC -c libc.c -o libc.o
+mylibc.o: mylibc.c
+	gcc -Wall -Wextra -masm=intel -fPIC -c mylibc.c -o mylibc.o
 
 .PHONY: run clean
