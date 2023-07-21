@@ -1,33 +1,36 @@
-P=exe
-L=libc
+PROGRAM=exe
+LIBRARY=libc
+PROGRAM_OBJECT=$(PROGRAM).o
+LIBRARY_OBJECT=$(LIBRARY).o
+LIBRARY_SHARED_OBJECT=$(LIBRARY).so
 ENTRY=main
 
 CFLAGS=-Wall -Wextra -masm=intel
 PWD=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 LD_LINUX_PATH=/lib/ld-linux-x86-64.so.2
 
-default: $(P)
+default: $(PROGRAM)
 
 clean:
-	rm -f $(L).so $(L).o $(P).o $(P)
+	rm -f $(LIBRARY_SHARED_OBJECT) $(LIBRARY_OBJECT) $(PROGRAM_OBJECT) $(PROGRAM)
 
-$(P): $(P).o $(L).so
+$(PROGRAM): $(PROGRAM_OBJECT) $(LIBRARY_SHARED_OBJECT)
 	ld \
 	--entry $(ENTRY) \
 	--library-path=$(PWD) \
-	--library=:$(L).so \
+	--library=:$(LIBRARY_SHARED_OBJECT) \
 	-rpath=$(PWD) \
 	--dynamic-linker=$(LD_LINUX_PATH) \
-	$(P).o \
-	-o $(P)
+	$(PROGRAM_OBJECT) \
+	-o $@
 
-$(P).o: $(P).c
-	gcc $(CFLAGS) -c $(P).c -o $(P).o
+$(PROGRAM_OBJECT): $(PROGRAM).c
+	gcc $(CFLAGS) -c $^ -o $@
 
-$(L).so: $(L).o
-	ld -shared $(L).o -o $(L).so
+$(LIBRARY_SHARED_OBJECT): $(LIBRARY_OBJECT)
+	ld -shared $^ -o $@
 
-$(L).o: $(L).c
-	gcc $(CFLAGS) -c $(L).c -o $(L).o
+$(LIBRARY_OBJECT): $(LIBRARY).c
+	gcc $(CFLAGS) -c $^ -o $@
 
 .PHONY: run clean
