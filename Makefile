@@ -1,28 +1,33 @@
-default: exe
+P=exe
+L=libc
+ENTRY=main
 
 CFLAGS=-Wall -Wextra -masm=intel
 PWD=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+LD_LINUX_PATH=/lib/ld-linux-x86-64.so.2
+
+default: $(P)
 
 clean:
-	rm -f libc.so libc.o exe.o exe
+	rm -f $(L).so $(L).o $(P).o $(P)
 
-exe: exe.o libc.so
+$(P): $(P).o $(L).so
 	ld \
-	--entry main \
+	--entry $(ENTRY) \
 	--library-path=$(PWD) \
-	-l:libc.so \
+	--library=:$(L).so \
 	-rpath=$(PWD) \
-	--dynamic-linker=/lib/ld-linux-x86-64.so.2 \
-	exe.o \
-	-o exe
+	--dynamic-linker=$(LD_LINUX_PATH) \
+	$(P).o \
+	-o $(P)
 
-exe.o: exe.c
-	gcc $(CFLAGS) -c exe.c -o exe.o
+$(P).o: $(P).c
+	gcc $(CFLAGS) -c $(P).c -o $(P).o
 
-libc.so: libc.o
-	ld -shared libc.o -o libc.so
+$(L).so: $(L).o
+	ld -shared $(L).o -o $(L).so
 
-libc.o: libc.c
-	gcc $(CFLAGS) -c libc.c -o libc.o
+$(L).o: $(L).c
+	gcc $(CFLAGS) -c $(L).c -o $(L).o
 
 .PHONY: run clean
