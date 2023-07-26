@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Wextra -O2 -masm=intel
+CFLAGS+=-Wall -Wextra -g -masm=intel -O3
 PWD=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 LD_LINUX_PATH=/lib/ld-linux-x86-64.so.2
 
