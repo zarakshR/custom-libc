@@ -1,23 +1,23 @@
-CFLAGS=-Wall -Wextra -masm=intel
+CFLAGS=-Wall -Wextra -O2 -masm=intel
 PWD=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 LD_LINUX_PATH=/lib/ld-linux-x86-64.so.2
 
-default: exe
+default: program
 
 clean:
-	rm -f libc.so libc.o exe.o exe
+	rm -f libc.so libc.o program.o program
 
-exe: exe.o libc.so
+program: program.o libc.so
 	ld \
 	--entry main \
 	--library-path=$(PWD) \
 	--library=:libc.so \
 	-rpath=$(PWD) \
 	--dynamic-linker=$(LD_LINUX_PATH) \
-	exe.o \
+	program.o \
 	-o $@
 
-exe.o: exe.c
+program.o: program.c
 	gcc $(CFLAGS) -c $^ -o $@
 
 libc.so: libc.o
