@@ -36,3 +36,20 @@ long syscall(long NR, long arg1, long arg2, long arg3, long arg4, long arg5, lon
 
     return retval;
 }
+
+ssize_t read(int fd, void * buf, size_t count) {
+    return syscall(0, fd, (long)buf, count, 0, 0, 0);
+}
+
+ssize_t write(int fd, void * buf, size_t count) {
+    return syscall(1, fd, (long)buf, (long)count, 0, 0, 0);
+}
+
+int close(int fd) {
+    return syscall(3, fd, 0, 0, 0, 0, 0);
+}
+
+[[noreturn]] void exit(int status) {
+    syscall(60, status, 0, 0, 0, 0, 0);
+    __builtin_unreachable();
+}
