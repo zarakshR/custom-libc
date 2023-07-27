@@ -1,0 +1,5 @@
+libc.o
+libc.so
+program.o
+program.so
+program
